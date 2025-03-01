@@ -55,7 +55,7 @@ async def create_character(data: Character):
     }
 # POST: Add a new quote
 @app.post("/add_quote")
-async def add_quote(data: Quote):
+async def add_quote(data: quote):
     file_name = "quotes.csv"
 
     # Ensure character exists before adding a quote
