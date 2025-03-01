@@ -1,7 +1,7 @@
 import os
 import json
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -11,6 +11,11 @@ class Character(BaseModel):
     name: str
     age: int
     favorite_food: str
+    quote: str
+
+# Quote schema
+class Quote(BaseModel):
+    name: str
     quote: str
 
 # Function to save the character as a new row to CSV file
@@ -53,9 +58,10 @@ async def create_character(data: Character):
         "favorite_food": data.favorite_food,
         "quote": data.quote
     }
+
 # POST: Add a new quote
 @app.post("/add_quote")
-async def add_quote(data: quote):
+async def add_quote(data: Quote):
     file_name = "quotes.csv"
 
     # Ensure character exists before adding a quote
@@ -65,6 +71,10 @@ async def add_quote(data: quote):
         if data.name not in df_chars["name"].values:
             raise HTTPException(status_code=404, detail="Character not found.")
 
+    # Save the quote
+    save_quote(data.name, data.quote)
+
+    return {"msg": "Quote added!", "name": data.name, "quote": data.quote}
 
 # GET: Get all characters route
 @app.get("/characters")
